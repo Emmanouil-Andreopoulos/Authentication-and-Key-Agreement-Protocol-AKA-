@@ -5,11 +5,23 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 
 namespace Client
 {
     class Client
     {
+        private static string GenerateRandomBits(int size)
+        {
+            using (RandomNumberGenerator rng = new RNGCryptoServiceProvider())
+            {
+                byte[] tokenData = new byte[size/8];// 1 byte = 8 bits
+                rng.GetBytes(tokenData);
+
+                return Convert.ToBase64String(tokenData);
+            }
+        }
+
         public static void StartClient() {  
             // Data buffer for incoming data.  
             byte[] bytes = new byte[1024];  
@@ -34,15 +46,15 @@ namespace Client
                         sender.RemoteEndPoint.ToString());  
 
                     // Encode the data string into a byte array.  
-                    byte[] msg = Encoding.ASCII.GetBytes("This is a test<EOF>");  
+                    byte[] msg = Encoding.ASCII.GetBytes("Hello");  
 
                     // Send the data through the socket.  
                     int bytesSent = sender.Send(msg);  
 
-                    // Receive the response from the remote device.  
-                    int bytesRec = sender.Receive(bytes);  
-                    Console.WriteLine("Echoed test = {0}",  
-                        Encoding.ASCII.GetString(bytes,0,bytesRec));  
+                    // Receive 64bits Cookie from server
+                    int bytesRec = sender.Receive(bytes);
+                    string Server_Cookie = Encoding.ASCII.GetString(bytes, 0, bytesRec);
+                    Console.WriteLine("Server Cookie: {0}", Server_Cookie);  
 
                     // Release the socket.  
                     sender.Shutdown(SocketShutdown.Both);  
