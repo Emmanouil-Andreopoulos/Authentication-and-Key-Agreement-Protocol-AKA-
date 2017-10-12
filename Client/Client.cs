@@ -45,16 +45,46 @@ namespace Client
                     Console.WriteLine("Socket connected to {0}",  
                         sender.RemoteEndPoint.ToString());  
 
-                    // Encode the data string into a byte array.  
+                    // Encode the Hello string into a byte array.  
                     byte[] msg = Encoding.ASCII.GetBytes("Hello");  
 
-                    // Send the data through the socket.  
+                    // Send Hello through the socket.  
                     int bytesSent = sender.Send(msg);  
 
                     // Receive 64bits Cookie from server
                     int bytesRec = sender.Receive(bytes);
                     string Server_Cookie = Encoding.ASCII.GetString(bytes, 0, bytesRec);
-                    Console.WriteLine("Server Cookie: {0}", Server_Cookie);  
+                    Console.WriteLine("Server Cookie: {0}", Server_Cookie);
+
+                    // Send back Server Cookie through the socket. 
+                    msg = Encoding.ASCII.GetBytes(Server_Cookie);
+                    bytesSent = sender.Send(msg);
+
+                    // Generate 64bits Cookie
+                    string Cookie = GenerateRandomBits(64);
+
+                    Console.WriteLine("Cookie: {0}", Cookie);
+
+                    // Send Cookie through the socket. 
+                    msg = Encoding.ASCII.GetBytes(Cookie);
+                    bytesSent = sender.Send(msg);
+                    System.Threading.Thread.Sleep(50);
+
+                    // Send supported suites to server
+                    msg = Encoding.ASCII.GetBytes("MD5");
+                    bytesSent = sender.Send(msg);
+                    System.Threading.Thread.Sleep(50);
+
+                    msg = Encoding.ASCII.GetBytes("SHA256");
+                    bytesSent = sender.Send(msg);
+                    System.Threading.Thread.Sleep(50);
+
+                    msg = Encoding.ASCII.GetBytes("Blowfish");
+                    bytesSent = sender.Send(msg);
+                    System.Threading.Thread.Sleep(50);
+
+                    msg = Encoding.ASCII.GetBytes("AES");
+                    bytesSent = sender.Send(msg);
 
                     // Release the socket.  
                     sender.Shutdown(SocketShutdown.Both);  

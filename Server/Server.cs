@@ -63,9 +63,55 @@ namespace Server
                 // Generate 64bits Cookie
                 string Cookie = GenerateRandomBits(64);
 
+                Console.WriteLine("Cookie: {0}", Cookie);
+
                 // Send 64bits Cookie to client 
                 handler.Send(Encoding.ASCII.GetBytes(Cookie));
 
+                // Receive back Cookie from client
+                bytes = new byte[1024];
+                bytesRec = handler.Receive(bytes);
+                data = Encoding.ASCII.GetString(bytes, 0, bytesRec);
+
+                // Check if received cookie is ok
+                if (Cookie.Equals(data))
+                {
+                    Console.WriteLine("Cookie check OK!");
+
+                    // Receive Client Cookie
+                    bytes = new byte[1024];
+                    bytesRec = handler.Receive(bytes);
+                    string Client_Cookie = Encoding.ASCII.GetString(bytes, 0, bytesRec);
+
+                    Console.WriteLine("Client Cookie: {0}", Client_Cookie);
+
+                    string[] client_suites = new string[4];
+
+                    // Receive supported suites from client
+                    bytes = new byte[1024];
+                    bytesRec = handler.Receive(bytes);
+                    client_suites[0] = Encoding.ASCII.GetString(bytes, 0, bytesRec);
+
+                    Console.WriteLine("Supported Client suite 1: {0}", client_suites[0]);
+
+                    bytes = new byte[1024];
+                    bytesRec = handler.Receive(bytes);
+                    client_suites[1] = Encoding.ASCII.GetString(bytes, 0, bytesRec);
+
+                    Console.WriteLine("Supported Client suite 2: {0}", client_suites[1]);
+
+                    bytes = new byte[1024];
+                    bytesRec = handler.Receive(bytes);
+                    client_suites[2] = Encoding.ASCII.GetString(bytes, 0, bytesRec);
+
+                    Console.WriteLine("Supported Client suite 3: {0}", client_suites[2]);
+
+                    bytes = new byte[1024];
+                    bytesRec = handler.Receive(bytes);
+                    client_suites[3] = Encoding.ASCII.GetString(bytes, 0, bytesRec);
+
+                    Console.WriteLine("Supported Client suite 4: {0}", client_suites[3]);
+                }
 
                 handler.Shutdown(SocketShutdown.Both);
                 handler.Close();
