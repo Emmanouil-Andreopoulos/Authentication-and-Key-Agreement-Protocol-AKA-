@@ -87,6 +87,17 @@ namespace Client
 
                     msg = Encoding.ASCII.GetBytes("AES");
                     bytesSent = sender.Send(msg);
+                    System.Threading.Thread.Sleep(50);
+
+                    // Receive chosen suites
+                    bytes = new byte[1024];
+                    bytesRec = sender.Receive(bytes);
+                    string suite1 = Encoding.ASCII.GetString(bytes, 0, bytesRec);
+                    Console.WriteLine("Suite 1: ", suite1);
+                    bytes = new byte[1024];
+                    bytesRec = sender.Receive(bytes);
+                    string suite2 = Encoding.ASCII.GetString(bytes, 0, bytesRec);
+                    Console.WriteLine("Suite 2: ", suite2);
 
                     // Release the socket.  
                     sender.Shutdown(SocketShutdown.Both);  

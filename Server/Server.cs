@@ -113,6 +113,13 @@ namespace Server
                     client_suites[3] = Encoding.ASCII.GetString(bytes, 0, bytesRec);
 
                     Console.WriteLine("Supported Client suite 4: {0}", client_suites[3]);
+
+                    //Send back the chosen suites
+                    handler.Send(Encoding.ASCII.GetBytes(client_suites[1]));
+                    System.Threading.Thread.Sleep(50);
+                    handler.Send(Encoding.ASCII.GetBytes(client_suites[3]));
+                    System.Threading.Thread.Sleep(50);
+                    //TODO: Send X.509 self-signed certificate
                 }
 
                 handler.Shutdown(SocketShutdown.Both);
