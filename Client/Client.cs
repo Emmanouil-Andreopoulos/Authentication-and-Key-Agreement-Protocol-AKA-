@@ -99,6 +99,10 @@ namespace Client
                     string suite2 = Encoding.ASCII.GetString(bytes, 0, bytesRec);
                     Console.WriteLine("Suite 2: ", suite2);
 
+                    //Generate 128bit RN 
+                    String RN = GenerateRandomBits(128);
+
+
                     // Release the socket.  
                     sender.Shutdown(SocketShutdown.Both);  
                     sender.Close();  
