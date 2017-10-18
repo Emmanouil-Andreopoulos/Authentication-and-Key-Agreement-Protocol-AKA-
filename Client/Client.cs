@@ -93,14 +93,24 @@ namespace Client
                     bytes = new byte[1024];
                     bytesRec = sender.Receive(bytes);
                     string suite1 = Encoding.ASCII.GetString(bytes, 0, bytesRec);
-                    Console.WriteLine("Suite 1: ", suite1);
+                    Console.WriteLine("Suite 1: {0}", suite1);
+                    System.Threading.Thread.Sleep(50);
                     bytes = new byte[1024];
                     bytesRec = sender.Receive(bytes);
                     string suite2 = Encoding.ASCII.GetString(bytes, 0, bytesRec);
-                    Console.WriteLine("Suite 2: ", suite2);
+                    Console.WriteLine("Suite 2: {0}", suite2);
+
+                    //TODO: Receive X.509 self-signed certificate and check
 
                     //Generate 128bit RN 
                     String RN = GenerateRandomBits(128);
+
+                    SHA256 mySHA256 = SHA256Managed.Create();
+
+                    //Cookie_Server | Cookie_Client | RN
+                    String C_server_C_client_RN = GetSHA256Hash(mySHA256, Server_Cookie + Cookie + RN);
+
+                    Console.WriteLine("SHA256: {0}", C_server_C_client_RN);
 
 
                     // Release the socket.  

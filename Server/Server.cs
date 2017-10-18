@@ -116,7 +116,7 @@ namespace Server
 
                     //Send back the chosen suites
                     handler.Send(Encoding.ASCII.GetBytes(client_suites[1]));
-                    System.Threading.Thread.Sleep(50);
+                    System.Threading.Thread.Sleep(100);
                     handler.Send(Encoding.ASCII.GetBytes(client_suites[3]));
                     System.Threading.Thread.Sleep(50);
                     //TODO: Send X.509 self-signed certificate
