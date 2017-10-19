@@ -112,6 +112,12 @@ namespace Client
 
                     Console.WriteLine("SHA256: {0}", C_server_C_client_RN);
 
+                    //Split SHA256(Cookie_Server | Cookie_Client | RN) in half to make key1 key2
+                    string key1 = C_server_C_client_RN.Substring(0, (int)(C_server_C_client_RN.Length / 2));
+                    string key2 = C_server_C_client_RN.Substring((int)(C_server_C_client_RN.Length / 2), (int)(C_server_C_client_RN.Length / 2));
+
+                    Console.WriteLine("Key1: {0}", key1);
+                    Console.WriteLine("Key2: {0}", key2);
 
                     // Release the socket.  
                     sender.Shutdown(SocketShutdown.Both);  
