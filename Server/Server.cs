@@ -120,6 +120,12 @@ namespace Server
                     handler.Send(Encoding.ASCII.GetBytes(client_suites[3]));
                     System.Threading.Thread.Sleep(50);
                     //TODO: Send X.509 self-signed certificate
+
+                    bytes = new byte[1024];
+                    bytesRec = handler.Receive(bytes);
+                    string en_RN = Encoding.ASCII.GetString(bytes, 0, bytesRec);
+
+
                 }
 
                 handler.Shutdown(SocketShutdown.Both);
