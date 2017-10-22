@@ -8,6 +8,7 @@ using System.Net.Sockets;
 using System.Security.Cryptography;
 using BlowFishCS;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Server
 {
@@ -119,7 +120,15 @@ namespace Server
                     System.Threading.Thread.Sleep(100);
                     handler.Send(Encoding.ASCII.GetBytes(client_suites[3]));
                     System.Threading.Thread.Sleep(50);
-                    //TODO: Send X.509 self-signed certificate
+
+                    //Read certificate from file
+                    X509Certificate2 Certificate = new X509Certificate2("..//..//my-cert.pem");
+
+                    //Convert Certificate to bytes and send to client
+                    handler.Send(Certificate.Export(X509ContentType.Cert));
+
+
+
 
                     bytes = new byte[1024];
                     bytesRec = handler.Receive(bytes);

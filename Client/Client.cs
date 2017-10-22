@@ -8,6 +8,7 @@ using System.Net.Sockets;
 using System.Security.Cryptography;
 using BlowFishCS;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Client
 {
@@ -99,8 +100,16 @@ namespace Client
                     bytesRec = sender.Receive(bytes);
                     string suite2 = Encoding.ASCII.GetString(bytes, 0, bytesRec);
                     Console.WriteLine("Suite 2: {0}", suite2);
+                    System.Threading.Thread.Sleep(150);
 
-                    //TODO: Receive X.509 self-signed certificate and check
+                    //Receive X.509 self-signed certificate
+                    bytes = new byte[1024];
+                    bytesRec = sender.Receive(bytes);
+                    X509Certificate2 Certificate = new X509Certificate2(bytes);
+                    //Display Certificate
+                    //Console.WriteLine(Certificate.ToString());
+
+                    //TODO: check certificate
 
                     //Generate 128bit RN 
                     String RN = GenerateRandomBits(128);
