@@ -124,8 +124,21 @@ namespace Server
                     bytes = new byte[1024];
                     bytesRec = handler.Receive(bytes);
                     string en_RN = Encoding.ASCII.GetString(bytes, 0, bytesRec);
+                    string RN = en_RN;//for testing
+                    //TODO: decrypt en_RN with private key
+                    SHA256 mySHA256 = SHA256Managed.Create();
 
+                    //Cookie_Server | Cookie_Client | RN
+                    String C_server_C_client_RN = GetSHA256Hash(mySHA256, Cookie + Client_Cookie + RN);
 
+                    Console.WriteLine("SHA256: {0}", C_server_C_client_RN);
+
+                    //Split SHA256(Cookie_Server | Cookie_Client | RN) in half to make key1 key2
+                    string key1 = C_server_C_client_RN.Substring(0, (int)(C_server_C_client_RN.Length / 2));
+                    string key2 = C_server_C_client_RN.Substring((int)(C_server_C_client_RN.Length / 2), (int)(C_server_C_client_RN.Length / 2));
+
+                    Console.WriteLine("Key1: {0}", key1);
+                    Console.WriteLine("Key2: {0}", key2);
                 }
 
                 handler.Shutdown(SocketShutdown.Both);
