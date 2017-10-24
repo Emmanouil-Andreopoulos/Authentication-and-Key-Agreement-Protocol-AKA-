@@ -103,11 +103,11 @@ namespace Client
                     System.Threading.Thread.Sleep(150);
 
                     //Receive X.509 self-signed certificate
-                    bytes = new byte[1024];
+                    bytes = new byte[2048];
                     bytesRec = sender.Receive(bytes);
-                    X509Certificate2 Certificate = new X509Certificate2(bytes);
+                    X509Certificate Certificate = new X509Certificate(bytes);
                     //Display Certificate
-                    //Console.WriteLine(Certificate.ToString());
+                    Console.WriteLine(Certificate.ToString(true));
 
                     //TODO: check certificate
 

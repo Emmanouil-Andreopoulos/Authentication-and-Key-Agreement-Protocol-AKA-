@@ -123,6 +123,7 @@ namespace Server
 
                     //Read certificate from file
                     X509Certificate2 Certificate = new X509Certificate2("..//..//my-cert.pem");
+                    Console.WriteLine(Certificate.ToString(true));
 
                     //Convert Certificate to bytes and send to client
                     handler.Send(Certificate.Export(X509ContentType.Cert));
