@@ -105,36 +105,45 @@ namespace Client
                     //Receive X.509 self-signed certificate
                     bytes = new byte[2048];
                     bytesRec = sender.Receive(bytes);
-                    X509Certificate Certificate = new X509Certificate(bytes);
+                    X509Certificate2 Certificate = new X509Certificate2(bytes);
                     //Display Certificate
                     Console.WriteLine(Certificate.ToString(true));
 
                     //TODO: check certificate
+                    if (Certificate.Verify())
+                    {
+                        Console.WriteLine("Certificate is valid!");
 
-                    //Generate 128bit RN 
-                    String RN = GenerateRandomBits(128);
+                        //Generate 128bit RN 
+                        String RN = GenerateRandomBits(128);
 
-                    SHA256 mySHA256 = SHA256Managed.Create();
+                        SHA256 mySHA256 = SHA256Managed.Create();
 
-                    //Cookie_Server | Cookie_Client | RN
-                    String C_server_C_client_RN = GetSHA256Hash(mySHA256, Server_Cookie + Cookie + RN);
+                        //Cookie_Server | Cookie_Client | RN
+                        String C_server_C_client_RN = GetSHA256Hash(mySHA256, Server_Cookie + Cookie + RN);
 
-                    Console.WriteLine("SHA256: {0}", C_server_C_client_RN);
+                        Console.WriteLine("SHA256: {0}", C_server_C_client_RN);
 
-                    //Split SHA256(Cookie_Server | Cookie_Client | RN) in half to make key1 key2
-                    string key1 = C_server_C_client_RN.Substring(0, (int)(C_server_C_client_RN.Length / 2));
-                    string key2 = C_server_C_client_RN.Substring((int)(C_server_C_client_RN.Length / 2), (int)(C_server_C_client_RN.Length / 2));
+                        //Split SHA256(Cookie_Server | Cookie_Client | RN) in half to make key1 key2
+                        string key1 = C_server_C_client_RN.Substring(0, (int)(C_server_C_client_RN.Length / 2));
+                        string key2 = C_server_C_client_RN.Substring((int)(C_server_C_client_RN.Length / 2), (int)(C_server_C_client_RN.Length / 2));
 
-                    Console.WriteLine("Key1: {0}", key1);
-                    Console.WriteLine("Key2: {0}", key2);
+                        Console.WriteLine("Key1: {0}", key1);
+                        Console.WriteLine("Key2: {0}", key2);
 
-                    //TODO: encrypt RN with server public key
-                    string en_RN = RN;//for testing
-                    msg = Encoding.ASCII.GetBytes(en_RN);
-                    bytesSent = sender.Send(msg);
-                    System.Threading.Thread.Sleep(50);
+                        //TODO: encrypt RN with server public key
+                        string en_RN = RN;//for testing
+                        msg = Encoding.ASCII.GetBytes(en_RN);
+                        bytesSent = sender.Send(msg);
+                        System.Threading.Thread.Sleep(50);
 
-                    HMACSHA256 hmac = new HMACSHA256(Encoding.ASCII.GetBytes(key2));
+                        HMACSHA256 hmac = new HMACSHA256(Encoding.ASCII.GetBytes(key2));
+
+                    }
+                    else
+                    {
+                        Console.WriteLine("Certificate is not valid!");
+                    }
 
                     // Release the socket.  
                     sender.Shutdown(SocketShutdown.Both);  
