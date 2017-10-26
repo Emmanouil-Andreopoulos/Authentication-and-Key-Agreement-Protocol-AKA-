@@ -109,8 +109,15 @@ namespace Client
                     //Display Certificate
                     Console.WriteLine(Certificate.ToString(true));
 
-                    //TODO: check certificate
-                    if (Certificate.Verify())
+                    string ans;
+                    //check certificate
+                    do
+                    {
+                        Console.WriteLine("Do you accept this certificate?(Y,N): ");
+                        ans = Console.ReadLine();
+                    } while (ans!="Y"&&ans!="N"&& ans != "y" && ans != "n");
+
+                    if (ans=="Y"||ans=="y")
                     {
                         Console.WriteLine("Certificate is valid!");
 
@@ -131,9 +138,11 @@ namespace Client
                         Console.WriteLine("Key1: {0}", key1);
                         Console.WriteLine("Key2: {0}", key2);
 
-                        //TODO: encrypt RN with server public key
-                        string en_RN = RN;//for testing
-                        msg = Encoding.ASCII.GetBytes(en_RN);
+                        //encrypt RN with server public key
+                        RSACryptoServiceProvider RSACSP = (RSACryptoServiceProvider)Certificate.PublicKey.Key;
+
+                        msg = RSACSP.Encrypt(Encoding.ASCII.GetBytes(RN), false);
+
                         bytesSent = sender.Send(msg);
                         System.Threading.Thread.Sleep(50);
 
