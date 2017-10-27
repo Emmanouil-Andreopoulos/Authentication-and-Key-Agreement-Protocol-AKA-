@@ -128,14 +128,14 @@ namespace Server
                     //Convert Certificate to bytes and send to client
                     handler.Send(Certificate.Export(X509ContentType.Cert));
 
-
-
-
-                    bytes = new byte[1024];
+                    bytes = new byte[256];
                     bytesRec = handler.Receive(bytes);
-                    string en_RN = Encoding.ASCII.GetString(bytes, 0, bytesRec);
-                    string RN = en_RN;//for testing
-                    //TODO: decrypt en_RN with private key
+
+                    //decrypt RN with private key
+                    X509Certificate2 Certificate2 = new X509Certificate2("..//..//AKA-cert.pfx","password123");
+                    RSACryptoServiceProvider RSACSP = (RSACryptoServiceProvider)Certificate2.PrivateKey;
+                    string RN = Encoding.ASCII.GetString(RSACSP.Decrypt(bytes,false));
+                    Console.WriteLine("RN: {0}", RN);
                     SHA256 mySHA256 = SHA256Managed.Create();
 
                     //Cookie_Server | Cookie_Client | RN

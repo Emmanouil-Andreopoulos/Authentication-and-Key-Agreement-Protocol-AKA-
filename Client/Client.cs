@@ -123,6 +123,7 @@ namespace Client
 
                         //Generate 128bit RN 
                         String RN = GenerateRandomBits(128);
+                        Console.WriteLine("RN: {0}", RN);
 
                         SHA256 mySHA256 = SHA256Managed.Create();
 
@@ -140,9 +141,9 @@ namespace Client
 
                         //encrypt RN with server public key
                         RSACryptoServiceProvider RSACSP = (RSACryptoServiceProvider)Certificate.PublicKey.Key;
+                        byte[] RN_S = Encoding.ASCII.GetBytes(RN);
 
-                        msg = RSACSP.Encrypt(Encoding.ASCII.GetBytes(RN), false);
-
+                        msg = RSACSP.Encrypt(RN_S, false);
                         bytesSent = sender.Send(msg);
                         System.Threading.Thread.Sleep(50);
 
