@@ -147,8 +147,12 @@ namespace Client
                         bytesSent = sender.Send(msg);
                         System.Threading.Thread.Sleep(50);
 
-                        HMACSHA256 hmac = new HMACSHA256(Encoding.ASCII.GetBytes(key2));
+                        HMACSHA256 hmac1 = new HMACSHA256(Encoding.ASCII.GetBytes(key2));
+                        String hmac = GetHMACSHA256Hash(hmac1,suite1+suite2);
 
+                        msg = Encoding.ASCII.GetBytes(hmac);
+                        bytesSent = sender.Send(msg);
+                        System.Threading.Thread.Sleep(50);
                     }
                     else
                     {

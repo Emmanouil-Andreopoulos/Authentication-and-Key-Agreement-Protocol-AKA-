@@ -149,6 +149,16 @@ namespace Server
 
                     Console.WriteLine("Key1: {0}", key1);
                     Console.WriteLine("Key2: {0}", key2);
+
+                    bytes = new byte[1024];
+                    bytesRec = handler.Receive(bytes);
+                    String hmac = Encoding.ASCII.GetString(bytes, 0, bytesRec);
+
+                    HMACSHA256 hmac1 = new HMACSHA256(Encoding.ASCII.GetBytes(key2));
+                    if (VerifyHMACSHA256Hash(hmac1,client_suites[1]+client_suites[3],hmac))
+                    {
+                        Console.WriteLine("HMAC is valid!");
+                    }
                 }
 
                 handler.Shutdown(SocketShutdown.Both);
