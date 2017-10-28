@@ -158,6 +158,13 @@ namespace Server
                     if (VerifyHMACSHA256Hash(hmac1,client_suites[1]+client_suites[3],hmac))
                     {
                         Console.WriteLine("HMAC is valid!");
+
+                        //
+                        handler.Send(Encoding.ASCII.GetBytes(EncryptString("acknowledgement_done", Encoding.ASCII.GetBytes(key1))));
+                    }
+                    else
+                    {
+                        Console.WriteLine("HMAC is not valid!");
                     }
                 }
 
@@ -259,83 +266,63 @@ namespace Server
             }
         }
 
-        static byte[] EncryptStringToBytes_Aes(string plainText, byte[] Key, byte[] IV)
+        static string EncryptString(string plainText, byte[] Key)
         {
-            // Check arguments.
             if (plainText == null || plainText.Length <= 0)
                 throw new ArgumentNullException("plainText");
             if (Key == null || Key.Length <= 0)
                 throw new ArgumentNullException("Key");
-            if (IV == null || IV.Length <= 0)
-                throw new ArgumentNullException("IV");
-            byte[] encrypted;
-            // Create an Aes object
-            // with the specified key and IV.
-            using (Aes aesAlg = Aes.Create())
+
+            using (Aes _aesAlg = Aes.Create())
             {
-                aesAlg.Key = Key;
-                aesAlg.IV = IV;
+                _aesAlg.Key = Key;
+                ICryptoTransform _encryptor = _aesAlg.CreateEncryptor(_aesAlg.Key, _aesAlg.IV);
 
-                // Create a decrytor to perform the stream transform.
-                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
-
-                // Create the streams used for encryption.
-                using (MemoryStream msEncrypt = new MemoryStream())
+                using (MemoryStream _memoryStream = new MemoryStream())
                 {
-                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    _memoryStream.Write(_aesAlg.IV, 0, 16);
+                    using (CryptoStream _cryptoStream = new CryptoStream(_memoryStream, _encryptor, CryptoStreamMode.Write))
                     {
-                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                        using (StreamWriter _streamWriter = new StreamWriter(_cryptoStream))
                         {
-
-                            //Write all data to the stream.
-                            swEncrypt.Write(plainText);
+                            _streamWriter.Write(plainText);
                         }
-                        encrypted = msEncrypt.ToArray();
+                        return Convert.ToBase64String(_memoryStream.ToArray());
                     }
                 }
             }
-
-
-            // Return the encrypted bytes from the memory stream.
-            return encrypted;
-
         }
 
-        static string DecryptStringFromBytes_Aes(byte[] cipherText, byte[] Key, byte[] IV)
+
+        static string DecryptString(string cipherText, byte[] Key)
         {
-            // Check arguments.
             if (cipherText == null || cipherText.Length <= 0)
                 throw new ArgumentNullException("cipherText");
             if (Key == null || Key.Length <= 0)
                 throw new ArgumentNullException("Key");
-            if (IV == null || IV.Length <= 0)
-                throw new ArgumentNullException("IV");
 
-            // Declare the string used to hold
-            // the decrypted text.
             string plaintext = null;
 
-            // Create an Aes object
-            // with the specified key and IV.
-            using (Aes aesAlg = Aes.Create())
+            byte[] _initialVector = new byte[16];
+            byte[] _cipherTextBytesArray = Convert.FromBase64String(cipherText);
+            byte[] _originalString = new byte[_cipherTextBytesArray.Length - 16];
+
+            Array.Copy(_cipherTextBytesArray, 0, _initialVector, 0, 16);
+            Array.Copy(_cipherTextBytesArray, 16, _originalString, 0, _cipherTextBytesArray.Length - 16);
+
+            using (Aes _aesAlg = Aes.Create())
             {
-                aesAlg.Key = Key;
-                aesAlg.IV = IV;
+                _aesAlg.Key = Key;
+                _aesAlg.IV = _initialVector;
+                ICryptoTransform decryptor = _aesAlg.CreateDecryptor(_aesAlg.Key, _aesAlg.IV);
 
-                // Create a decrytor to perform the stream transform.
-                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
-
-                // Create the streams used for decryption.
-                using (MemoryStream msDecrypt = new MemoryStream(cipherText))
+                using (MemoryStream _memoryStream = new MemoryStream(_originalString))
                 {
-                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                    using (CryptoStream _cryptoStream = new CryptoStream(_memoryStream, decryptor, CryptoStreamMode.Read))
                     {
-                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                        using (StreamReader _streamReader = new StreamReader(_cryptoStream))
                         {
-
-                            // Read the decrypted bytes from the decrypting stream
-                            // and place them in a string.
-                            plaintext = srDecrypt.ReadToEnd();
+                            plaintext = _streamReader.ReadToEnd();
                         }
                     }
                 }
