@@ -144,23 +144,26 @@ namespace Server
                     Console.WriteLine("SHA256: {0}", C_server_C_client_RN);
 
                     //Split SHA256(Cookie_Server | Cookie_Client | RN) in half to make key1 key2
-                    string key1 = C_server_C_client_RN.Substring(0, (int)(C_server_C_client_RN.Length / 2));
-                    string key2 = C_server_C_client_RN.Substring((int)(C_server_C_client_RN.Length / 2), (int)(C_server_C_client_RN.Length / 2));
+                    string s_key1 = C_server_C_client_RN.Substring(0, (int)(C_server_C_client_RN.Length / 2));
+                    string s_key2 = C_server_C_client_RN.Substring((int)(C_server_C_client_RN.Length / 2), (int)(C_server_C_client_RN.Length / 2));
 
-                    Console.WriteLine("Key1: {0}", key1);
-                    Console.WriteLine("Key2: {0}", key2);
+                    Console.WriteLine("Key1: {0}", s_key1);
+                    Console.WriteLine("Key2: {0}", s_key2);
+
+                    byte[] key1 = Encoding.ASCII.GetBytes(s_key1);
+                    byte[] key2 = Encoding.ASCII.GetBytes(s_key2);
 
                     bytes = new byte[1024];
                     bytesRec = handler.Receive(bytes);
                     String hmac = Encoding.ASCII.GetString(bytes, 0, bytesRec);
 
-                    HMACSHA256 hmac1 = new HMACSHA256(Encoding.ASCII.GetBytes(key2));
+                    HMACSHA256 hmac1 = new HMACSHA256(key2);
                     if (VerifyHMACSHA256Hash(hmac1,client_suites[1]+client_suites[3],hmac))
                     {
                         Console.WriteLine("HMAC is valid!");
 
                         //
-                        handler.Send(Encoding.ASCII.GetBytes(EncryptString("acknowledgement_done", Encoding.ASCII.GetBytes(key1))));
+                        handler.Send(Encoding.ASCII.GetBytes(EncryptString("acknowledgement_done", key1)));
                     }
                     else
                     {

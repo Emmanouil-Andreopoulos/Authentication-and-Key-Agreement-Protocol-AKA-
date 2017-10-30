@@ -133,11 +133,14 @@ namespace Client
                         Console.WriteLine("SHA256: {0}", C_server_C_client_RN);
 
                         //Split SHA256(Cookie_Server | Cookie_Client | RN) in half to make key1 key2
-                        string key1 = C_server_C_client_RN.Substring(0, (int)(C_server_C_client_RN.Length / 2));
-                        string key2 = C_server_C_client_RN.Substring((int)(C_server_C_client_RN.Length / 2), (int)(C_server_C_client_RN.Length / 2));
+                        string s_key1 = C_server_C_client_RN.Substring(0, (int)(C_server_C_client_RN.Length / 2));
+                        string s_key2 = C_server_C_client_RN.Substring((int)(C_server_C_client_RN.Length / 2), (int)(C_server_C_client_RN.Length / 2));
 
-                        Console.WriteLine("Key1: {0}", key1);
-                        Console.WriteLine("Key2: {0}", key2);
+                        Console.WriteLine("Key1: {0}", s_key1);
+                        Console.WriteLine("Key2: {0}", s_key2);
+
+                        byte[] key1 = Encoding.ASCII.GetBytes(s_key1);
+                        byte[] key2 = Encoding.ASCII.GetBytes(s_key2);
 
                         //encrypt RN with server public key
                         RSACryptoServiceProvider RSACSP = (RSACryptoServiceProvider)Certificate.PublicKey.Key;
@@ -148,7 +151,7 @@ namespace Client
                         System.Threading.Thread.Sleep(50);
 
                         //generate HMAC(Suite1+Suite2)
-                        HMACSHA256 hmac1 = new HMACSHA256(Encoding.ASCII.GetBytes(key2));
+                        HMACSHA256 hmac1 = new HMACSHA256(key2);
                         String hmac = GetHMACSHA256Hash(hmac1,suite1+suite2);
 
                         //send HMAC
@@ -159,7 +162,7 @@ namespace Client
                         //receive acknowledgement
                         bytes = new byte[1024];
                         bytesRec = sender.Receive(bytes);
-                        string ack = DecryptString(Encoding.ASCII.GetString(bytes, 0, bytesRec), Encoding.ASCII.GetBytes(key1));
+                        string ack = DecryptString(Encoding.ASCII.GetString(bytes, 0, bytesRec), key1);
 
                         if (ack=="acknowledgement_done")
                         {
